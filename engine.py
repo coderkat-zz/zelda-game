@@ -4,7 +4,7 @@ import pyglet
 from pyglet.window import key
 from core import GameElement
 
-SCREEN_X = 1600
+SCREEN_X = 1800
 SCREEN_Y = 1050
 
 game_window = pyglet.window.Window(SCREEN_X, SCREEN_Y)
@@ -40,6 +40,12 @@ def setup_images():
             "OrangeGem": "Gem Orange.png",
             "Heart": "Heart.png",
             "LitTorch": "lit_torch.png",
+            "LitLamp": "Big_Torch_Lit.png",
+            "BlueRupee": "blue_rupee.png",
+            "GameWin": "Game_Win.png",
+            "GameWinBig": "Game_Win_big.png",
+            "Ganondorf": "Ganondorf.png",
+            "Navi": "Navi.png",
             "Key": "Key.png",
             "Boy": "Character Boy.png",
             "Cat": "Character Cat Girl.png",
@@ -48,7 +54,7 @@ def setup_images():
             "Princess": "Character Princess Girl.png",
             "Zelda": "zelda.png",
             "SkullBones": "skullbones.png",
-            "UnlitTorch": "Torch.png",
+            "UnlitLamp": "Torch.png",
             "Water": "Water Block.png"
             }
 
@@ -167,6 +173,10 @@ class Board(object):
         # Draw the label if it exists:
         if self.message:
             self.message.draw()
+        """    
+        # Draw the inventory if told to 
+        if player.inventory["Show_Inventory"] == True:
+        """
 
         # Draw the content layer
         for y in range(self.height):
