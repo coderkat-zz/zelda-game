@@ -11,7 +11,7 @@ KEYBOARD = None
 PLAYER = None
 ######################
 
-GAME_WIDTH = 14 # 11 seems to be the biggest these can be without changing the screen size and 10 is biggest it can be while retaining space for the messages
+GAME_WIDTH = 10 # 11 seems to be the biggest these can be without changing the screen size and 10 is biggest it can be while retaining space for the messages
 GAME_HEIGHT = 10
 game_running = True
 
@@ -19,7 +19,6 @@ game_running = True
 #### Put class definitions here ####
 class Character(GameElement):
     IMAGE = "Zelda" # sets class attribute so your player is a girl
-    #SOLID = True
     def __init__(self): # initializer that sets up object with initial values
         GameElement.__init__(self) # tells Character class to call parent class' initializer so that it uses the behaviors of board interactions set
         # self.inventory = []
@@ -79,41 +78,6 @@ class BadGuy(GameElement):
             global game_running
             game_running = False
 
-class Navi(GameElement):
-    IMAGE = "Cat"
-    SOLID = True
-    def __init__(self): # initializer that sets up object with initial values
-        GameElement.__init__(self) # tells Character class to call parent class' initializer so that it uses the behaviors of board interactions set
-        # self.inventory = []
-        self.inventory = {
-            "Torches":0,
-                }
-
-    def next_pos(self, direction): # when called, takes character and direction set by keyboard handler
-        if direction == "up": 
-            return (self.x, self.y-1) # returns proper new x and y location for the keyboard_handler's decided direction
-        elif direction == "down":
-            return (self.x, self.y+1)
-        elif direction == "left":
-            return (self.x-1, self.y)
-        elif direction == "right":
-            return (self.x+1, self.y)
-        elif direction == "upright":
-            return (self.x+1, self.y-1)
-        elif direction == "upleft":
-            return (self.x-1, self.y-1)
-        elif direction == "downright":
-            return (self.x+1, self.y+1)
-        elif direction == "downleft":
-            return (self.x-1, self.y+1)
-        return None
-
-    
-    def interact(self,player):
-        if self.inventory["Torches"] > 0:
-            player.inventory["Torches"] += 1
-
-
 class Link(GameElement):
     IMAGE = "DoorOpen"
     SOLID = False
@@ -136,12 +100,12 @@ class Rock(GameElement):
         if self.SOLID == False:
             player.inventory["Rocks"] += 1
             GAME_BOARD.draw_msg("You picked up a rock! I bet that can kill mean things or whatever with the %d that you now have."%(player.inventory["Rocks"])) 
-
+"""
 class Water(GameElement):
     IMAGE = "Water"
     SOLID = True
     # will this work? it's supposed to be "base" tiles, so it might render funky
-
+"""
 
 
 class LitLamp(GameElement):
@@ -291,9 +255,7 @@ def keyboard_handler():
 
     # if a direction is set by keystroke, call next_pos function on Character
     if direction:
-        next_location = PLAYER.next_pos(direction)
-        next_navi_location = NAVI.next_pos(direction)
-
+        next_location = PLAYER.next_pos(direction) 
         # here we are using the returned tuple from next_pos to find character's new location
         #print next_location
         global PLAYER
@@ -305,33 +267,39 @@ def keyboard_handler():
             next_location = (4,4)
         elif next_location == (4,4):
             next_location = (0,9)
-        
-        
-        elif PLAYER.inventory["Badguy"] == True and (next_location == (7, 0) or next_location == (7,1) or next_location == (8,2) or next_location == (9,2)):
+        elif PLAYER.inventory["Badguy"] == False and (next_location == (7, 0) or next_location == (7,1) or next_location == (8,2) or next_location == (9,2)):
             # delete player
             lastplayer = (PLAYER.x, PLAYER.y)
             GAME_BOARD.del_el(lastplayer[0], lastplayer[1])
+            GAME_BOARD.del_el(BADGUY.x, BADGUY.y)
             # add badguy to where you were and give message
-            death = DeathImage()
-            GAME_BOARD.register(death)
-            GAME_BOARD.set_el(next_location[0], next_location[1], death)
+            badguywin = BadGuy()
+            GAME_BOARD.register(badguywin)
+            GAME_BOARD.set_el(lastplayer[0], lastplayer[1], badguywin)
             GAME_BOARD.draw_msg("Just because he's a bad guy doesn't mean he doesn't care about his heart. He had to kill you to save it!!!")
             global game_running
             game_running = False
         
+
         next_x = next_location[0]
         next_y = next_location[1]
-        
-        global GAME_WIDTH
-        global GAME_HEIGHT
-       
-        if not (0 <= next_x < GAME_WIDTH) or not (0 <= next_y < GAME_HEIGHT):
-            next_x = PLAYER.x # then don't move
-            next_y = PLAYER.y
 
         # check to see if there's anything already in the spot to which you're goin
         # set it to existing_el, existing_el will be false if nothing is there
-        
+        """
+        global GAME_WIDTH
+        global GAME_HEIGHT
+        if not (0 <= next.x < GAME_WIDTH) or not (0 <= next.y < GAME_HEIGHT):
+            next_x = PLAYER.x
+            next_y = PLAYER.y
+        """   
+        """
+        if not (0 <= x < self.width):
+            raise IndexError("%r is out of bounds of the board width: %d"%(x, self.width))
+        if not (0 <= y < self.height):
+            raise IndexError("%r is out of bounds of the board height: %d"%(y, self.width))
+        """
+
         existing_el = GAME_BOARD.get_el(next_x, next_y)
 
         if existing_el:
@@ -347,47 +315,13 @@ def keyboard_handler():
             # if the thing there is a solid door (end of game)
             elif existing_el and existing_el.SOLID and existing_el.IMAGE == "Door":
                 game_end()
-            else:        
-                GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
-                GAME_BOARD.set_el(next_x, next_y, PLAYER)
-
-        next_navi_x = next_navi_location[0]
-        next_navi_y = next_navi_location[1]
-        
-        global GAME_WIDTH
-        global GAME_HEIGHT
-       
-        if not (0 <= next_navi_x < GAME_WIDTH) or not (0 <= next_navi_y < GAME_HEIGHT) or not (11 <= next_navi_x < 14) or not (0 <= next_navi_y < 5):
-            next_navi_x = NAVI.x # then don't move
-            next_navi_y = NAVI.y
-        
-        if next_navi_location == (13,1): # navi's one-way portal
-            next_navi_x = 12
-            next_navi_y = 8
-            # Print message re: if Navi has the torch or not
-            if NAVI.inventory["Torches"] == 0:
-                GAME_BOARD.draw_msg("Oh no! Navi got out without the torch! Looks like Link's gonna die in there...")
             else:
-                GAME_BOARD.draw_msg("Hooray! Navi got the torch for you and is patiently waiting for you to grab it.")
-
-        existing_navi_el = GAME_BOARD.get_el(next_navi_x, next_navi_y)
-
-        if existing_navi_el:
-            existing_navi_el.interact(NAVI)
-
-
-        if existing_el is None or not existing_el.SOLID:
-            # if there IS something there, and it's a solid BOMB (death)
-            """
-            if existing_el and existing_el.SOLID and existing_el.IMAGE == "Bomb": 
-                game_end()
-            # if the thing there is a solid door (end of game)
-            elif existing_el and existing_el.SOLID and existing_el.IMAGE == "Door":
-                game_end()
-            """
-            GAME_BOARD.del_el(NAVI.x, NAVI.y)
-            GAME_BOARD.set_el(next_navi_x, next_navi_y, NAVI)
-        
+                try:
+                    GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
+                    GAME_BOARD.set_el(next_x, next_y, PLAYER)
+                except IndexError:
+                    print "Forget about it! That's the abyss."
+        #if 
 
 # initialize function of game
 def initialize():
@@ -404,11 +338,6 @@ def initialize():
     GAME_BOARD.register(BADGUY)
     GAME_BOARD.set_el(7, 2, BADGUY)
     print BADGUY
-
-    global NAVI 
-    NAVI = Navi()
-    GAME_BOARD.register(NAVI)
-    GAME_BOARD.set_el(11,2, NAVI)
 
     # set rock positions
     rock_positions = [
@@ -448,23 +377,17 @@ def initialize():
         potions.append(potion)
 
     bomb_positions = [
-        (9,7),
-        (9,8),
-        (8,7),
-        (8,8),
-        (8,9),
-        (7,7),
-        (7,8),
-        (7,9),
-        (8,4),
-        (7,5),
-        (10,7),
-        (10,8),
-        (10,9),
-        (11,7),
-        (11,8),
-        (11,9)
-    ]
+            (9,7),
+            (9,8),
+            (8,7),
+            (8,8),
+            (8,9),
+            (7,7),
+            (7,8),
+            (7,9),
+            (8,4),
+            (7,5)
+        ]
     
     bombs = []
     
@@ -494,15 +417,6 @@ def initialize():
         (4,6),
         (2,9),
         (3,9),
-        (10,0),
-        (10,1),
-        (10,2),
-        (10,3),
-        (10,4),
-        (10,5),
-        (11,5),
-        (12,5),
-        (13,5)
     ]
     
     walls = []
@@ -581,25 +495,8 @@ def initialize():
 
     torch = Torch()
     GAME_BOARD.register(torch)
-    GAME_BOARD.set_el(13, 3, torch)
+    GAME_BOARD.set_el(9, 5, torch)
 
-    """
-    moat_positions = [
-            (11,0),
-            (11,1),
-            (11,2),
-            (11,3),
-            (11,4)
-        ]
-    
-    moats = []
-    
-    for positi in moat_positions:
-        moat = Water()
-        GAME_BOARD.register(moat)
-        GAME_BOARD.set_el(positi[0], positi[1], moat)
-        moats.append(moat)
-    """
 
     GAME_BOARD.draw_msg("Hurry, Zelda! Save Link by opening and reaching the door.")
 

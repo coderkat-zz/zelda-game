@@ -4,8 +4,8 @@ import pyglet
 from pyglet.window import key
 from core import GameElement
 
-SCREEN_X = 1200
-SCREEN_Y = 1000
+SCREEN_X = 1600
+SCREEN_Y = 1050
 
 game_window = pyglet.window.Window(SCREEN_X, SCREEN_Y)
 
@@ -31,6 +31,7 @@ def setup_images():
             "BestTree": "zelda_tree.png",
             "Rock": "Rock.png",
             "Chest": "Chest Closed.png",
+            "OpenChest": "Chest Open.png",
             "DoorClosed": "Door Tall Closed.png",
             "DoorOpen": "Door Tall Open.png",
             "BlueGem": "Gem Blue.png",
@@ -47,7 +48,8 @@ def setup_images():
             "Princess": "Character Princess Girl.png",
             "Zelda": "zelda.png",
             "SkullBones": "skullbones.png",
-            "UnlitTorch": "Torch.png"
+            "UnlitTorch": "Torch.png",
+            "Water": "Water Block.png"
             }
 
     for k,v in filenames.items():
@@ -80,9 +82,9 @@ class Board(object):
         for i in range(height):
             if i == 0 or i == height-1:
                 # On the boundaries
-                game_map.append(["Block"] * width)
+                game_map.append(["StoneBlock"] * width)
             else:
-                row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
+                row = ["StoneBlock"] + (["GrassBlock"] * inner_width) + ["StoneBlock"]
                 game_map.append(row)
         
         self.base_board = game_map
