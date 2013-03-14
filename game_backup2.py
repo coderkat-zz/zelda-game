@@ -32,7 +32,8 @@ class Character(GameElement):
             "Torches":0,
             "Lightings":0,
             "BlueRupees":0,
-            "Badguy":True
+            "Badguy":True,
+            "Show_Inventory": False
             } # this instance's inventory starts as an empty list
 
     def next_pos(self, direction): # when called, takes character and direction set by keyboard handler
@@ -277,6 +278,11 @@ def keyboard_handler():
         direction += "left"
     elif KEYBOARD[key.RIGHT]:
         direction += "right"
+    elif KEYBOARD[key.I]:
+        player.inventory["Show_Inventory"] = True
+    elif KEYBOARD[key.ESCAPE]:
+        player.inventor["Show_Inventory"] = False
+
     """
     # this would be for if arrows turned the direction you were looking so that the program could look at what was in front of you.
     if KEYBOARD[key.SPACE]:
@@ -592,9 +598,9 @@ def initialize():
         GAME_BOARD.set_el(positi[0], positi[1], rupee)
         rupees.append(rupee)
 
-    
+    GAME_BOARD.draw_list.append(MyWindow())
 
-    GAME_BOARD.draw_msg("Hurry, Zelda! Save Link by opening and reaching the door.")
+    GAME_BOARD.draw_msg("Hurry, Zelda! Save Link by unlocking and reaching the door.")
 
 """
 def game_end():
@@ -611,3 +617,13 @@ def game_end():
     initialize()
     game_running = True
    """
+
+
+class MyWindow(object):
+    def draw(self):
+        print "Drawing the window"
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ("v2i", 
+            (50, 830,
+             50, 630,
+             250, 630,
+             250, 830))
